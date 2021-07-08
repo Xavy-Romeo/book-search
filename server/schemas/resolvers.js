@@ -8,7 +8,7 @@ const resolvers = {
             if (context.user) {
                 const userData = await User.findOne({ _id: context.user._id})
                     .select('-__v -password')
-                    .populate('savedBooks');
+                    .populate('books');
                 
                 return userData;
             }
@@ -18,12 +18,12 @@ const resolvers = {
         users: async () => {
             return User.find()
                 .select('-__v -password')
-                .populate('savedBooks');
+                .populate('books');
         },
         user: async (parent, { username }) => {
             return User.findOne({ username })
                 .select('-__v -password')
-                .populate('savedBooks');
+                .populate('books');
         }
     },
     Mutation: {
@@ -53,7 +53,6 @@ const resolvers = {
 
         saveBook: async (parent, { bookData }, context) => {
             if (context.user) {
-
                 const updatedUser = await User.findByIdAndUpdate(
                     { _id: context.user._id },
                     { $addToSet: { savedBooks: bookData}},
@@ -65,11 +64,18 @@ const resolvers = {
 
             throw new AuthenticationError('You need to log in!')
         },
+        
+        deleteBook: async (parent, { bookId }, context) => {
+            if (context.user) {
+                const updatedUser = await User.findOneAndUpdate(
+                    { _id: context.user._id },
+                    { $pull: { savedBooks: {bookId} }},
+                    { new: true }
+                )
+                return updatedUser
+            }
 
-
-
-        deleteBook: async () => {
-
+            throw new AuthenticationError('You need to log in!')
         }
     } 
 };
