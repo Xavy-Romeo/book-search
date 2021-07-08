@@ -39,8 +39,18 @@ const resolvers = {
             return { token, user };
             
         },
-        saveBook: async () => {
+        saveBook: async (parent, { bookData } , context) => {
+            if (context.user) {
+                const updateUser = await User.findByIdAndUpdate(
+                    { _id: context.user._id },
+                    { $addToSet: { savedBooks: bookData }},
+                    { new: true }
+                ).populate('savedBooks');
 
+                return updateUser;
+            }
+
+            throw new AuthenticationError('You need to be logged in to save books!')
         },
         deleteBook: async () => {
 
