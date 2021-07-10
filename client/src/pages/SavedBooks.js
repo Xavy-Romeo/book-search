@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Jumbotron, Container, CardColumns, Card, Button } from 'react-bootstrap';
 import { useQuery, useMutation } from '@apollo/client';
 
@@ -25,8 +25,6 @@ const SavedBooks = () => {
       const { data } = await deleteBook({
         variables: { bookId: bookId }
       });
-
-      const response = await deleteBook(bookId, token);
       
       // upon success, remove book's id from localStorage
       removeBookId(bookId);
